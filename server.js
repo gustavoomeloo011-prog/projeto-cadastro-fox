@@ -56,6 +56,7 @@ const allowedDocumentTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const internetOnlyPlans = {};
 
 const contractConfig = {
+  contractId: Number(process.env.CONTRACT_CONTRATO_ID || 0),
   popId: Number(process.env.CONTRACT_POP_ID || 0),
   nasId: Number(process.env.CONTRACT_NAS_ID || 0),
   portadorId: Number(process.env.CONTRACT_PORTADOR_ID || 0),
@@ -1906,6 +1907,7 @@ async function handleCadastro(req, res) {
     clientPayload.planointernet_id = selectedPlanId;
   }
   if (selectedTvPlan?.id) clientPayload.planobase_id = selectedTvPlan.id;
+  if (contractConfig.contractId) clientPayload.contrato_id = contractConfig.contractId;
   if (contractConfig.popId) clientPayload.pop_id = contractConfig.popId;
   if (contractConfig.nasId) clientPayload.nas_id = contractConfig.nasId;
   if (contractConfig.portadorId) clientPayload.portador_id = contractConfig.portadorId;

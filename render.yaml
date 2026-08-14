@@ -29,6 +29,8 @@ services:
         value: true
       - key: CONTRACT_POP_ID
         value: 1
+      - key: CONTRACT_CONTRATO_ID
+        value: 3
       - key: CONTRACT_NAS_ID
         value: 4
       - key: CONTRACT_PORTADOR_ID
