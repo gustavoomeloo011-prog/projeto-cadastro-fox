@@ -27,6 +27,18 @@ services:
         value: 14680064
       - key: PRECADASTRO_ATIVAR
         value: true
+      - key: CONTRACT_POP_ID
+        value: 1
+      - key: CONTRACT_NAS_ID
+        value: 4
+      - key: CONTRACT_PORTADOR_ID
+        value: 8
+      - key: CONTRACT_FORMACOBRANCA_ID
+        value: 3
+      - key: CONTRACT_MODOAQUISICAO
+        value: 1
+      - key: CONTRACT_OS_INSTALACAO
+        value: true
       - key: PUBLIC_BASE_URL
         sync: false
       - key: ALLOW_RENDER_HOST

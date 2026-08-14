@@ -1359,15 +1359,24 @@ async function updateInstallationOs(contractId, serviceDescription, cpf) {
 
 async function latestContractIdFor(cpf) {
   try {
-    const data = await sgpPost("/api/central/contratos", {
+    const data = await sgpForm("/api/ura/clientes/", {
       app: SGP_APP,
       token: SGP_TOKEN,
       cpfcnpj: cpf,
-      senha: "foxfibra"
+      limit: 10
     });
-    const contracts = Array.isArray(data?.contratos) ? data.contratos : [];
-    const ids = contracts
-      .map((contract) => Number(contract?.contrato || contract?.contrato_id || contract?.id || 0))
+    const targetCpf = normalizeCpfText(cpf);
+    const objects = collectObjects(data);
+    const matchingClients = objects.filter((item) => (
+      normalizeCpfText(item.cpfcnpj || item.cpf || item.documento || "") === targetCpf
+    ));
+    const contractObjects = matchingClients.length
+      ? matchingClients.flatMap((item) => collectObjects(item, []))
+      : objects;
+    const ids = contractObjects
+      .map((contract) => Number(
+        contract?.contrato || contract?.contrato_id || contract?.clientecontrato_id || 0
+      ))
       .filter((id) => id > 0);
     return ids.length ? String(Math.max(...ids)) : "";
   } catch (error) {
