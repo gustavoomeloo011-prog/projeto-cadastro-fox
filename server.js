@@ -121,14 +121,7 @@ function isInternetOnlyPlan(key, plan) {
 }
 
 function publicPlanEntries() {
-  const merged = { ...internetOnlyPlans };
-  Object.entries(contractConfig.plans).forEach(([key, plan]) => {
-    if (internetOnlyPlans[key]) {
-      merged[key] = plan;
-    } else if (!knownPlanIds[key]) {
-      merged[key] = plan;
-    }
-  });
+  const merged = { ...internetOnlyPlans, ...contractConfig.plans };
   const entries = Object.entries(merged).filter(([key, plan]) => isInternetOnlyPlan(key, plan));
   return entries;
 }
@@ -707,7 +700,7 @@ function htmlPage(csrf, nonce = "") {
         <label>Celular/WhatsApp<input name="celular" type="tel" autocomplete="tel" required></label>
         <label class="full">E-mail<input name="email" type="email" autocomplete="email" required></label>
         <label>Vencimento<select name="vencimento" required><option value="">Selecione</option><option value="5">Dia 5</option><option value="10">Dia 10</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select></label>
-        <label>Disponibilidade para instalaÃ§Ã£o<select name="disponibilidade" required><option value="">Selecione</option><option value="manha">ManhÃ£ das 09h - 12h</option><option value="tarde">Tarde das 12h - 17h</option><option value="total">Total</option></select></label>
+        <label>Disponibilidade para instalação<select name="disponibilidade" required><option value="">Selecione</option><option value="manha">Manhã das 09h - 12h</option><option value="tarde">Tarde das 12h - 17h</option><option value="total">Total</option></select></label>
         <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" required></label>
         <label>Numero<input name="numero" required></label>
         <label class="full">Rua<input name="logradouro" required></label>
