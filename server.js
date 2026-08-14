@@ -64,14 +64,20 @@ const contractConfig = {
   vencimentoDia: Number(process.env.CONTRACT_VENCIMENTO_DIA || 10),
   modoAquisicao: Number(process.env.CONTRACT_MODOAQUISICAO || 1),
   osInstalacao: String(process.env.CONTRACT_OS_INSTALACAO || "true") === "true",
-  plans: parsePlans(process.env.PLANS_JSON || '{"100":{"id":11,"name":"100 Mega — R$ 49,99"},"150":{"id":8,"name":"150 Mega — R$ 49,99"},"250":{"id":14,"name":"250 Mega — R$ 69,99"},"300":{"id":10,"name":"300 Mega — R$ 89,99"},"350":{"id":19,"name":"350 Mega — R$ 79,99"},"400":{"id":22,"name":"400 Mega — R$ 69,99"},"500":{"id":9,"name":"500 Mega — R$ 89,99"},"600":{"id":30,"name":"600 Mega + App — R$ 89,99"},"700":{"id":29,"name":"700 Mega — R$ 89,99"},"800":{"id":18,"name":"800 Mega — R$ 129,99"},"900":{"id":28,"name":"900 Mega — R$ 99,99"},"1000":{"id":17,"name":"1 Giga — R$ 179,99"}}')
+  plans: parsePlans(process.env.PLANS_JSON || '{"300":{"id":10,"name":"300 Mega — R$ 89,99"},"500":{"id":9,"name":"500 Mega — R$ 89,99"},"700":{"id":29,"name":"700 Mega — R$ 89,99"},"900":{"id":28,"name":"900 Mega — R$ 99,99"}}')
+};
+
+const tvPlans = {
+  "zapping": { id: 23, name: "Zapping TV Full", price: "R$ 54,99" },
+  "playhub-hbo": { id: 20, name: "PlayHub Premium + HBO Max", price: "R$ 30,00" },
+  "playhub-disney": { id: 21, name: "PlayHub Premium + Disney+", price: "R$ 30,00" }
 };
 
 const emailConfig = {
   enabled: String(process.env.CONFIRMATION_EMAIL_ENABLED || "false") === "true",
   brevoApiKey: String(process.env.BREVO_API_KEY || ""),
   brevoSenderEmail: clean(process.env.BREVO_SENDER_EMAIL || "", 180),
-  brevoSenderName: clean(process.env.BREVO_SENDER_NAME || "Fox Fibra", 80),
+  brevoSenderName: clean(process.env.BREVO_SENDER_NAME || "EBF Telecom", 80),
   host: clean(process.env.SMTP_HOST || "", 180),
   port: Number(process.env.SMTP_PORT || 465),
   secure: String(process.env.SMTP_SECURE || "true") === "true",
@@ -136,6 +142,10 @@ function planLabelFor(key) {
   const planKey = clean(key, 60);
   const plan = contractConfig.plans[planKey] || internetOnlyPlans[planKey];
   return clean(plan?.name || planKey || "Plano nao informado", 100);
+}
+
+function tvPlanFor(key) {
+  return tvPlans[clean(key, 40)] || null;
 }
 
 function vencimentoId(day = 0) {
@@ -626,7 +636,7 @@ function clearAdminSession(req, res) {
 }
 
 function adminLoginPage(error = "") {
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Login - Painel Fox Fibra</title><style>body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#06172f,#0b3b78);display:grid;min-height:100vh;margin:0;place-items:center;color:#102033}.card{background:#fff;border-radius:10px;box-shadow:0 24px 70px rgba(0,0,0,.3);display:grid;gap:16px;max-width:390px;padding:28px;width:calc(100% - 28px)}img{height:auto;margin:auto;max-width:160px}h1{font-size:24px;margin:0;text-align:center}label{display:grid;gap:7px;font-weight:800}input{border:1px solid #d9e4f2;border-radius:8px;font:inherit;font-size:16px;min-height:48px;padding:12px}button{background:#006cff;border:0;border-radius:8px;color:#fff;cursor:pointer;font:inherit;font-weight:900;min-height:50px}.error{background:#fee2e2;border-radius:8px;color:#991b1b;font-weight:800;padding:12px;text-align:center}.muted{color:#607086;font-size:13px;text-align:center}</style></head><body><form class="card" method="post" action="/admin/login"><img src="/logo.png" alt="Fox Fibra"><h1>Painel operacional</h1>${error ? `<div class="error">${escapeHtml(error)}</div>` : ""}<label>Login<input name="user" autocomplete="username" required autofocus></label><label>Senha<input name="password" type="password" autocomplete="current-password" required></label><button type="submit">Entrar</button><div class="muted">Acesso restrito Fox Fibra</div></form></body></html>`;
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Login - Painel EBF Telecom</title><style>body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#06172f,#0b3b78);display:grid;min-height:100vh;margin:0;place-items:center;color:#102033}.card{background:#fff;border-radius:10px;box-shadow:0 24px 70px rgba(0,0,0,.3);display:grid;gap:16px;max-width:390px;padding:28px;width:calc(100% - 28px)}img{height:auto;margin:auto;max-width:160px}h1{font-size:24px;margin:0;text-align:center}label{display:grid;gap:7px;font-weight:800}input{border:1px solid #d9e4f2;border-radius:8px;font:inherit;font-size:16px;min-height:48px;padding:12px}button{background:#006cff;border:0;border-radius:8px;color:#fff;cursor:pointer;font:inherit;font-weight:900;min-height:50px}.error{background:#fee2e2;border-radius:8px;color:#991b1b;font-weight:800;padding:12px;text-align:center}.muted{color:#607086;font-size:13px;text-align:center}</style></head><body><form class="card" method="post" action="/admin/login"><img src="/logo.png" alt="EBF Telecom"><h1>Painel operacional</h1>${error ? `<div class="error">${escapeHtml(error)}</div>` : ""}<label>Login<input name="user" autocomplete="username" required autofocus></label><label>Senha<input name="password" type="password" autocomplete="current-password" required></label><button type="submit">Entrar</button><div class="muted">Acesso restrito EBF Telecom</div></form></body></html>`;
 }
 
 function adminPage() {
@@ -637,7 +647,7 @@ function adminPage() {
   const logs = adminEvents.map((event) => (
     `<tr><td>${escapeHtml(formatDateTime(event.at))}</td><td>${escapeHtml(event.type)}</td><td>${escapeHtml(event.status)}</td><td><pre>${escapeHtml(JSON.stringify(event.details, null, 2))}</pre></td></tr>`
   )).join("") || `<tr><td colspan="4">Nenhum log registrado desde o ultimo reinicio.</td></tr>`;
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Painel Fox Fibra</title><style>body{font-family:Arial,sans-serif;background:#f4f8fc;color:#102033;margin:0;padding:24px}main{max-width:1180px;margin:auto}h1,h2{margin:0 0 14px}.top{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-bottom:20px}.card{background:#fff;border:1px solid #d9e4f2;border-radius:8px;margin:0 0 18px;padding:18px;box-shadow:0 10px 28px rgba(7,27,54,.08)}table{width:100%;border-collapse:collapse;font-size:14px}th,td{border-bottom:1px solid #d9e4f2;padding:10px;text-align:left;vertical-align:top}th{background:#f8fbff}pre{white-space:pre-wrap;margin:0;max-width:520px}button,a.btn{background:#006cff;border:0;border-radius:6px;color:#fff;display:inline-block;font-weight:700;padding:9px 12px;text-decoration:none}form{margin:0}.muted{color:#607086;font-size:13px}@media(max-width:760px){body{padding:12px}table{display:block;overflow:auto;white-space:nowrap}}</style></head><body><main><div class="top"><div><h1>Painel operacional</h1><div class="muted">Dados em memoria. Reinicio do Render limpa fila e logs.</div></div><a class="btn" href="/admin">Atualizar</a></div><section class="card"><h2>Fila de processamento</h2><table><thead><tr><th>Status</th><th>Tipo</th><th>Resumo</th><th>Tentativas</th><th>Erro</th><th>Ação</th></tr></thead><tbody>${rows}</tbody></table></section><section class="card"><h2>Logs recentes</h2><table><thead><tr><th>Data</th><th>Tipo</th><th>Status</th><th>Detalhes</th></tr></thead><tbody>${logs}</tbody></table></section></main></body></html>`;
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Painel EBF Telecom</title><style>body{font-family:Arial,sans-serif;background:#f4f8fc;color:#102033;margin:0;padding:24px}main{max-width:1180px;margin:auto}h1,h2{margin:0 0 14px}.top{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-bottom:20px}.card{background:#fff;border:1px solid #d9e4f2;border-radius:8px;margin:0 0 18px;padding:18px;box-shadow:0 10px 28px rgba(7,27,54,.08)}table{width:100%;border-collapse:collapse;font-size:14px}th,td{border-bottom:1px solid #d9e4f2;padding:10px;text-align:left;vertical-align:top}th{background:#f8fbff}pre{white-space:pre-wrap;margin:0;max-width:520px}button,a.btn{background:#006cff;border:0;border-radius:6px;color:#fff;display:inline-block;font-weight:700;padding:9px 12px;text-decoration:none}form{margin:0}.muted{color:#607086;font-size:13px}@media(max-width:760px){body{padding:12px}table{display:block;overflow:auto;white-space:nowrap}}</style></head><body><main><div class="top"><div><h1>Painel operacional</h1><div class="muted">Dados em memoria. Reinicio do Render limpa fila e logs.</div></div><a class="btn" href="/admin">Atualizar</a></div><section class="card"><h2>Fila de processamento</h2><table><thead><tr><th>Status</th><th>Tipo</th><th>Resumo</th><th>Tentativas</th><th>Erro</th><th>Ação</th></tr></thead><tbody>${rows}</tbody></table></section><section class="card"><h2>Logs recentes</h2><table><thead><tr><th>Data</th><th>Tipo</th><th>Status</th><th>Detalhes</th></tr></thead><tbody>${logs}</tbody></table></section></main></body></html>`;
 }
 
 function retryJob(id) {
@@ -652,8 +662,13 @@ function retryJob(id) {
 }
 
 function htmlPage(csrf, nonce = "") {
-  const planOptions = publicPlanEntries().map(([key, plan]) => (
-    `<label class="plan-option"><input type="radio" name="plan" value="${escapeHtml(key)}" required><span>${escapeHtml(plan.name || key)}</span></label>`
+  const planOptions = publicPlanEntries().map(([key, plan], index) => {
+    const label = String(plan.name || key);
+    const [speed, price = "Consulte"] = label.split(" — ");
+    return `<label class="plan-option${index === 1 ? " featured" : ""}"><input type="radio" name="plan" value="${escapeHtml(key)}" required><span class="plan-check">✓</span><span class="plan-speed">${escapeHtml(speed)}</span><span class="plan-price">${escapeHtml(price)}</span>${index === 1 ? '<span class="popular">Mais escolhido</span>' : ""}</label>`;
+  }).join("");
+  const tvOptions = Object.entries(tvPlans).map(([key, plan]) => (
+    `<label class="tv-option"><input type="radio" name="tv_plan" value="${escapeHtml(key)}"><span class="tv-icon">TV</span><span><strong>${escapeHtml(plan.name)}</strong><small>${escapeHtml(plan.price)}/mês</small></span><span class="plan-check">✓</span></label>`
   )).join("");
 
   return `<!doctype html>
@@ -662,35 +677,41 @@ function htmlPage(csrf, nonce = "") {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
-  <title>&Aacute;rea de cadastro</title>
-  <link rel="icon" href="/logo.png" type="image/png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <title>Contrate sua internet | EBF Telecom</title>
+  <meta name="theme-color" content="#f15a24">
+  <link rel="icon" href="/favicon.ico?v=ebf2" type="image/png">
+  <link rel="shortcut icon" href="/favicon.ico?v=ebf2" type="image/png">
+  <link rel="apple-touch-icon" href="/logo.png?v=ebf2">
   <style nonce="${escapeHtml(nonce)}">
-    :root{--navy:#06172f;--blue:#006cff;--gold:#ffb31a;--soft:#f4f8fc;--line:#d9e4f2;--muted:#607086}
-    *{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#06172f,#0b2447 48%,#f4f8fc 48%);color:#102033;font-family:Arial,Helvetica,sans-serif;line-height:1.45}
-    main{min-height:100vh;padding:30px 5%;display:grid;place-items:center}.wrap{width:min(100%,980px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 24px 60px rgba(7,27,54,.22);overflow:hidden}
-    header{background:linear-gradient(120deg,var(--navy),#0b3b78);color:#fff;padding:34px}header span{color:var(--gold);font-weight:900;text-transform:uppercase;font-size:12px;letter-spacing:1.4px}h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:10px 0}header p{color:#d7e6f8;max-width:720px;margin:0}
-    form{display:grid;gap:18px;padding:28px}.grid{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}label{display:grid;gap:7px;color:#263f5c;font-weight:800;font-size:14px}input,select,textarea{border:1px solid var(--line);border-radius:8px;font:inherit;font-size:16px;min-height:46px;padding:12px;background:#f8fbff;color:#102033}textarea{min-height:86px;resize:vertical}.full{grid-column:1/-1}.uppercase-input{text-transform:uppercase}
-    .plans{background:#f8fbff;border:1px solid var(--line);border-radius:8px;padding:16px}.plan-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.plan-option{display:flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
-    .documents{background:#fff8e8;border:1px solid #ffd98a;border-radius:8px;display:grid;gap:12px;padding:16px}.documents p{color:#5f3a00;margin:0}.documents input[type=file]{background:#fff;border-style:dashed;padding:10px}
+    :root{--orange:#f15a24;--orange-dark:#c83d0d;--ink:#171717;--soft:#f6f6f4;--line:#e6e3df;--muted:#6c6864;--green:#16845b}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#efefed;color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+    body:before{content:"";position:fixed;inset:0 0 auto;height:360px;background:radial-gradient(circle at 85% 10%,rgba(241,90,36,.24),transparent 30%),linear-gradient(135deg,#101010,#292724);z-index:-1}
+    main{min-height:100vh;padding:28px 18px 56px}.wrap{width:min(100%,1080px);margin:auto;background:#fff;border-radius:28px;box-shadow:0 26px 80px rgba(0,0,0,.22);overflow:hidden}
+    .hero{position:relative;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:30px;min-height:310px;padding:42px 52px;background:linear-gradient(120deg,#151515 0%,#292725 70%,#3b261e 100%);color:#fff;overflow:hidden}.hero:after{content:"";position:absolute;width:280px;height:280px;border:70px solid rgba(241,90,36,.12);border-radius:50%;right:-100px;top:-120px}.hero-copy{position:relative;z-index:1}.brand{display:inline-flex;align-items:center;gap:10px;color:#ff8a5f;font-size:12px;font-weight:900;letter-spacing:1.7px;text-transform:uppercase}.brand:before{content:"";width:28px;height:3px;border-radius:3px;background:var(--orange)}h1{font-size:clamp(34px,5vw,58px);letter-spacing:-2px;line-height:1.02;margin:15px 0 14px;max-width:680px}.hero p{color:#d8d5d2;font-size:17px;max-width:650px;margin:0}.hero-logo{position:relative;z-index:1;background:#fff;border-radius:24px;padding:22px;box-shadow:0 18px 40px rgba(0,0,0,.22);transform:rotate(2deg)}.hero-logo img{display:block;width:100%;height:auto}.benefits{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.benefits span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.13);border-radius:999px;color:#fff;font-size:12px;font-weight:800;padding:8px 12px}
+    .form-intro{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 42px;background:#fff7f3;border-bottom:1px solid #ffe1d5}.form-intro strong{font-size:18px}.form-intro span{color:var(--muted);font-size:13px}.secure{color:var(--green)!important;font-weight:800}
+    form{display:grid;gap:20px;padding:34px 42px 44px}.form-section{border:1px solid var(--line);border-radius:20px;padding:24px;background:#fff}.section-title{display:flex;align-items:center;gap:13px;margin-bottom:20px}.section-number{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:var(--orange);color:#fff;font-weight:900}.section-title h2{font-size:20px;letter-spacing:-.4px;margin:0}.section-title p{color:var(--muted);font-size:13px;margin:2px 0 0}.grid{display:grid;gap:15px;grid-template-columns:repeat(2,minmax(0,1fr))}label{display:grid;gap:7px;color:#3f3c39;font-weight:800;font-size:13px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;font:inherit;font-size:16px;min-height:52px;padding:13px 14px;background:#faf9f8;color:var(--ink);outline:none;transition:.2s}input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--orange);box-shadow:0 0 0 4px rgba(241,90,36,.11)}textarea{min-height:92px;resize:vertical}.full{grid-column:1/-1}.uppercase-input{text-transform:uppercase}
+    .plans{border:0;padding:0}.plan-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.plan-option{position:relative;display:flex;min-height:132px;flex-direction:column;justify-content:center;gap:3px;border:2px solid var(--line);border-radius:17px;padding:18px 14px;background:#fff;cursor:pointer;transition:.2s}.plan-option:hover{border-color:#ff9b76;transform:translateY(-2px);box-shadow:0 10px 25px rgba(241,90,36,.1)}.plan-option input{position:absolute;opacity:0;pointer-events:none}.plan-option:has(input:checked){border-color:var(--orange);background:#fff7f3;box-shadow:0 0 0 3px rgba(241,90,36,.12)}.plan-speed{font-size:20px;font-weight:950;color:var(--ink)}.plan-price{color:var(--orange-dark);font-size:13px;font-weight:900}.plan-check{display:none;position:absolute;right:10px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;text-align:center;line-height:24px}.plan-option:has(input:checked) .plan-check{display:block}.popular{position:absolute;left:12px;top:-10px;background:var(--orange);color:#fff;border-radius:999px;padding:4px 9px;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+    .tv-block{margin-top:22px;padding-top:22px;border-top:1px solid var(--line)}.tv-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.tv-heading strong{font-size:16px}.optional{background:#efefed;border-radius:999px;color:var(--muted);font-size:10px;padding:4px 8px;text-transform:uppercase}.tv-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.tv-option{position:relative;display:flex;align-items:center;grid-template-columns:auto 1fr;gap:10px;border:2px solid var(--line);border-radius:15px;padding:14px;background:#fff;cursor:pointer}.tv-option input{position:absolute;opacity:0}.tv-option:has(input:checked){border-color:var(--orange);background:#fff7f3}.tv-option .plan-check{right:8px;top:8px}.tv-option:has(input:checked) .plan-check{display:block}.tv-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:10px;background:#1d1d1d;color:#fff;font-size:11px;font-weight:950}.tv-option strong{display:block;padding-right:18px;font-size:12px;line-height:1.25}.tv-option small{display:block;color:var(--orange-dark);font-size:11px;margin-top:4px}
+    .documents{background:#fffaf7;border:1px dashed #f2ae92;border-radius:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px}.documents .doc-copy{grid-column:1/-1}.documents p{color:var(--muted);font-size:13px;margin:4px 0 0}.documents input[type=file]{background:#fff;border-style:dashed;padding:10px;height:auto}
     .success-modal{position:fixed;inset:0;background:rgba(3,12,26,.94);display:none;z-index:20;align-items:center;justify-content:center;padding:18px;overflow:auto}.success-modal.is-open{display:flex}
-    .consent{display:flex;align-items:flex-start;gap:10px;font-weight:700;color:#39536f}.consent input{min-height:auto;margin-top:4px}.hidden{display:none}
-    button{background:var(--blue);border:0;border-radius:8px;color:#fff;cursor:pointer;font-size:16px;font-weight:900;min-height:52px;padding:14px 18px}button:disabled{opacity:.65;cursor:wait}.result{border-radius:8px;display:none;font-weight:800;padding:14px}.result.error{background:#fee2e2;color:#991b1b;display:block}.success-card{background:#fff;border:1px solid rgba(255,255,255,.2);border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.35);color:#102033;display:grid;gap:14px;justify-items:center;max-width:440px;padding:26px;text-align:center;width:min(100%,440px)}.success-card img{height:auto;max-width:190px;width:58%}.success-card strong{font-size:24px;line-height:1.15}.success-card p{color:#39536f;margin:0}.protocol{display:inline-block;background:#fff8e8;border:1px solid #ffd98a;border-radius:8px;color:#5f3a00;font-size:20px;font-weight:900;margin-top:2px;padding:10px 12px}.success-close{width:100%}
-    @media(max-width:720px){body{background:#f4f8fc}.grid{grid-template-columns:1fr}main{display:block;padding:0}.wrap{border:0;border-radius:0;min-height:100vh;width:100%;box-shadow:none}header{padding:22px}form{gap:14px;padding:18px}.success-modal{align-items:flex-start;padding:12px}.success-card{margin-top:26px;padding:22px 16px}}
+    .consent{display:flex;align-items:flex-start;gap:11px;font-weight:700;color:#514d49;padding:0 4px}.consent input{width:20px;min-height:20px;margin-top:1px;accent-color:var(--orange)}.hidden{display:none}.submit-row{display:grid;gap:10px}.submit-row small{text-align:center;color:var(--muted)}button{background:linear-gradient(135deg,var(--orange),#d94711);border:0;border-radius:14px;color:#fff;cursor:pointer;font-size:17px;font-weight:950;min-height:58px;padding:15px 20px;box-shadow:0 12px 25px rgba(241,90,36,.24);transition:.2s}button:hover{transform:translateY(-1px);box-shadow:0 15px 30px rgba(241,90,36,.3)}button:disabled{opacity:.65;cursor:wait}.result{border-radius:12px;display:none;font-weight:800;padding:14px}.result.error{background:#fee2e2;color:#991b1b;display:block}.success-modal{position:fixed;inset:0;background:rgba(10,10,10,.94);display:none;z-index:20;align-items:center;justify-content:center;padding:18px;overflow:auto}.success-modal.is-open{display:flex}.success-card{background:#fff;border-radius:24px;box-shadow:0 24px 70px rgba(0,0,0,.35);display:grid;gap:14px;justify-items:center;max-width:440px;padding:30px;text-align:center;width:min(100%,440px)}.success-card img{height:auto;max-width:210px;width:65%}.success-card strong{font-size:25px;line-height:1.15}.success-card p{color:var(--muted);margin:0}.protocol{display:inline-block;background:#fff2ec;border:1px solid #ffd0bd;border-radius:10px;color:var(--orange-dark);font-size:18px;font-weight:900;padding:10px 12px}.success-close{width:100%}
+    @media(max-width:820px){body:before{height:250px}.hero{grid-template-columns:1fr;padding:30px}.hero-logo{max-width:260px}.plan-list{grid-template-columns:repeat(2,minmax(0,1fr))}.form-intro{padding:20px 24px}form{padding:24px}.form-section{padding:20px}}
+    @media(max-width:560px){body{background:#fff}main{display:block;padding:0}.wrap{border-radius:0;box-shadow:none;min-height:100vh}.hero{min-height:auto;padding:25px 20px 28px}.hero-logo{max-width:190px;padding:13px;border-radius:16px}.brand{font-size:10px}h1{font-size:36px;letter-spacing:-1.5px}.hero p{font-size:15px}.benefits{gap:7px}.benefits span{font-size:10px;padding:6px 9px}.form-intro{align-items:flex-start;flex-direction:column;padding:17px 18px}.grid{grid-template-columns:1fr}.full{grid-column:auto}form{gap:14px;padding:16px}.form-section{border-radius:16px;padding:17px}.section-title{align-items:flex-start}.section-title h2{font-size:18px}.plan-list{grid-template-columns:1fr 1fr;gap:9px}.plan-option{min-height:112px;padding:15px 11px}.plan-speed{font-size:17px}.tv-list{grid-template-columns:1fr}.documents{grid-template-columns:1fr}.documents .doc-copy{grid-column:auto}.success-modal{align-items:flex-start;padding:12px}.success-card{margin-top:26px;padding:24px 17px}}
   </style>
 </head>
 <body>
 <main>
   <section class="wrap">
-    <header>
-      <span>Fox Fibra</span>
-      <h1>Cadastro para instalação</h1>
-      <p>Preencha seus dados para a equipe consultar a disponibilidade, criar seu cadastro e continuar o atendimento.</p>
+    <header class="hero">
+      <div class="hero-copy"><span class="brand">EBF Telecom</span><h1>Internet rápida para tudo que conecta você.</h1><p>Escolha seu plano e envie seus dados. A equipe EBF cuida do restante para instalar sua nova conexão.</p><div class="benefits"><span>✓ Fibra óptica</span><span>✓ Instalação acompanhada</span><span>✓ Cadastro seguro</span></div></div>
+      <div class="hero-logo"><img src="/logo.png" alt="EBF Telecom"></div>
     </header>
+    <div class="form-intro"><div><strong>Vamos começar sua contratação</strong><br><span>Leva poucos minutos. Campos obrigatórios estão sinalizados.</span></div><span class="secure">● Ambiente seguro</span></div>
     <form id="cadastro-form" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="${escapeHtml(csrf)}">
       <input class="hidden" name="website" tabindex="-1" autocomplete="off">
-      <div class="grid">
+      ${planOptions ? `<section class="form-section plans"><div class="section-title"><span class="section-number">1</span><div><h2>Escolha seu plano</h2><p>Selecione a velocidade ideal para sua casa.</p></div></div><div class="plan-list">${planOptions}</div><div class="tv-block"><div class="tv-heading"><strong>Quer adicionar TV?</strong><span class="optional">Opcional</span></div><div class="tv-list">${tvOptions}</div></div></section>` : ""}
+      <section class="form-section"><div class="section-title"><span class="section-number">2</span><div><h2>Seus dados</h2><p>Precisamos destas informações para criar o cadastro.</p></div></div><div class="grid">
         <label>Nome completo<input name="nome" autocomplete="name" autocapitalize="characters" class="uppercase-input" required></label>
         <label>CPF<input name="cpfcnpj" inputmode="numeric" autocomplete="off" required></label>
         <label>RG<input name="rg" autocomplete="off" required></label>
@@ -698,7 +719,8 @@ function htmlPage(csrf, nonce = "") {
         <label>Sexo<select name="sexo" required><option value="">Selecione</option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
         <label>Estado civil<select name="estadocivil" required><option value="">Selecione</option><option value="S">Solteiro(a)</option><option value="C">Casado(a)</option><option value="D">Divorciado(a)</option><option value="V">Viuvo(a)</option></select></label>
         <label>Celular/WhatsApp<input name="celular" type="tel" autocomplete="tel" required></label>
-        <label class="full">E-mail<input name="email" type="email" autocomplete="email" required></label>
+        <label class="full">E-mail<input name="email" type="email" autocomplete="email" required></label></div></section>
+      <section class="form-section"><div class="section-title"><span class="section-number">3</span><div><h2>Instalação e endereço</h2><p>Conte onde e quando prefere receber a equipe.</p></div></div><div class="grid">
         <label>Vencimento<select name="vencimento" required><option value="">Selecione</option><option value="5">Dia 5</option><option value="10">Dia 10</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select></label>
         <label>Disponibilidade para instalação<select name="disponibilidade" required><option value="">Selecione</option><option value="manha">Manhã das 09h - 12h</option><option value="tarde">Tarde das 12h - 17h</option><option value="total">Total</option></select></label>
         <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" required></label>
@@ -708,24 +730,21 @@ function htmlPage(csrf, nonce = "") {
         <label>Cidade<input name="cidade" required></label>
         <label>UF<input name="uf" maxlength="2" required></label>
         <label>Complemento<input name="complemento"></label>
-        <label class="full">Ponto de referencia<textarea name="pontoreferencia"></textarea></label>
-      </div>
-      ${planOptions ? `<div class="plans"><strong>Plano de interesse</strong><div class="plan-list">${planOptions}</div></div>` : ""}
-      <div class="documents">
-        <strong>Documento com foto</strong>
-        <p>Envie frente e verso do documento para seguranca, comprovacao do cadastro e ativacao do contrato. Voce pode escolher um arquivo ou tirar uma foto pela camera.</p>
+        <label class="full">Ponto de referência<textarea name="pontoreferencia"></textarea></label></div></section>
+      <section class="form-section"><div class="section-title"><span class="section-number">4</span><div><h2>Confirmação de identidade</h2><p>As imagens são enviadas com segurança para o seu cadastro.</p></div></div><div class="documents">
+        <div class="doc-copy"><strong>Documento com foto</strong><p>Envie frente e verso. No celular, você também pode tirar a foto na hora.</p></div>
         <label>Frente do documento<input name="documento_frente" type="file" accept="image/jpeg,image/png,image/webp" required></label>
         <label>Verso do documento<input name="documento_verso" type="file" accept="image/jpeg,image/png,image/webp" required></label>
-      </div>
-      <label class="consent"><input type="checkbox" name="consent" value="1" required> Autorizo a Fox Fibra a usar estes dados para cadastro, atendimento e consulta de disponibilidade.</label>
-      <button type="submit">Enviar cadastro</button>
+      </div></section>
+      <label class="consent"><input type="checkbox" name="consent" value="1" required> Autorizo a EBF Telecom a usar estes dados para cadastro, atendimento e consulta de disponibilidade.</label>
+      <div class="submit-row"><button type="submit">Quero contratar minha internet</button><small>Seus dados são usados somente para esta contratação.</small></div>
       <div id="result" class="result"></div>
     </form>
   </section>
 </main>
 <div class="success-modal" id="success-modal" aria-hidden="true">
   <div class="success-card">
-    <img src="/logo.png" alt="Fox Fibra">
+    <img src="/logo.png" alt="EBF Telecom">
     <strong id="success-title">Dados enviados com sucesso</strong>
     <span class="protocol" id="success-protocol">ID do contrato: -</span>
     <p id="success-help">Confira seu e-mail para receber o contrato digital. Ele precisa ser assinado antes da chegada do tecnico.</p>
@@ -823,7 +842,7 @@ function htmlPage(csrf, nonce = "") {
       result.className = "result";
       result.innerHTML = "";
       successTitle.textContent = data.message || "Cadastro concluido";
-      successProtocol.textContent = data.protocol ? (data.protocolLabel || "ID do contrato") + ": " + data.protocol : "Cadastro recebido pela Fox Fibra";
+      successProtocol.textContent = data.protocol ? (data.protocolLabel || "ID do contrato") + ": " + data.protocol : "Cadastro recebido pela EBF Telecom";
       successHelp.textContent = data.documentMessage || "Tire um print desta tela e envie para um atendente no WhatsApp para continuar o atendimento.";
       successModal.classList.add("is-open");
       successModal.setAttribute("aria-hidden", "false");
@@ -833,7 +852,7 @@ function htmlPage(csrf, nonce = "") {
       result.textContent = error.message;
     } finally {
       button.disabled = false;
-      button.textContent = "Enviar cadastro";
+      button.textContent = "Quero contratar minha internet";
     }
   });
 </script>
@@ -1464,8 +1483,8 @@ function documentUploads(files) {
   return {
     errors,
     uploads: [
-      front ? { ...front, description: "Documento frente - cadastro online Fox Fibra" } : null,
-      back ? { ...back, description: "Documento verso - cadastro online Fox Fibra" } : null
+      front ? { ...front, description: "Documento frente - cadastro online EBF Telecom" } : null,
+      back ? { ...back, description: "Documento verso - cadastro online EBF Telecom" } : null
     ].filter(Boolean)
   };
 }
@@ -1505,7 +1524,7 @@ function installationServiceDescription({ name, cpf, phone, email, rg, planLabel
   };
   if (installationDescriptionTemplate) return fillTemplate(installationDescriptionTemplate, values);
   return [
-    "📌 Novo cadastro recebido pelo site Fox Fibra",
+    "📌 Novo cadastro recebido pelo site EBF Telecom",
     "",
     `📶 Plano escolhido: ${values.plano}`,
     `⏰ Disponibilidade para instalacao: ${values.disponibilidade}`,
@@ -1546,11 +1565,11 @@ async function sendConfirmationEmail({ to, name, contractId, planLabel, vencimen
   const safeContract = clean(contractId, 40) || "em analise";
   const safeVencimento = clean(vencimentoDay, 2) || "informado";
   const signatureUrl = await resolveSignatureContractUrl(safeContract);
-  const subject = "Cadastro recebido - Fox Fibra";
+  const subject = "Cadastro recebido - EBF Telecom";
   const text = [
     `Ola, ${safeName}.`,
     "",
-    "Seja bem-vindo(a) a Fox Fibra.",
+    "Seja bem-vindo(a) a EBF Telecom.",
     "Recebemos seu cadastro e vamos dar continuidade com a contratacao do novo ponto.",
     "",
     `ID do contrato: ${safeContract}`,
@@ -1562,24 +1581,24 @@ async function sendConfirmationEmail({ to, name, contractId, planLabel, vencimen
     "",
     signatureUrl
       ? `Acesse o contrato para conferencia e assinatura eletronica: ${signatureUrl}`
-      : "O link correto da assinatura eletronica do contrato sera enviado pela equipe Fox Fibra assim que estiver disponivel.",
+      : "O link correto da assinatura eletronica do contrato sera enviado pela equipe EBF Telecom assim que estiver disponivel.",
     "",
     `Avalie nosso atendimento no Google: ${GOOGLE_REVIEW_URL}`,
     "",
     "Se ainda nao enviou o print da tela de conclusao para o atendimento, envie pelo WhatsApp para facilitar a localizacao do cadastro.",
     "",
     "Atenciosamente,",
-    "Fox Fibra"
+    "EBF Telecom"
   ].join("\n");
   const html = `
     <div style="font-family:Arial,sans-serif;color:#102033;line-height:1.5;max-width:620px;margin:0 auto">
       <div style="background:#06172f;border-radius:14px 14px 0 0;padding:22px;text-align:center">
-        <img src="${escapeHtml(publicBaseUrl())}/logo.png" alt="Fox Fibra" style="display:block;height:auto;margin:0 auto;max-width:170px">
+        <img src="${escapeHtml(publicBaseUrl())}/logo.png" alt="EBF Telecom" style="display:block;height:auto;margin:0 auto;max-width:170px">
       </div>
       <div style="border:1px solid #d7e6ff;border-top:0;border-radius:0 0 14px 14px;padding:24px">
-      <h2 style="color:#0066ff;margin:0 0 12px">Bem-vindo(a) a Fox Fibra</h2>
+      <h2 style="color:#0066ff;margin:0 0 12px">Bem-vindo(a) a EBF Telecom</h2>
       <p>Ola, <strong>${escapeHtml(safeName)}</strong>.</p>
-      <p>Seja bem-vindo(a) a Fox Fibra. Recebemos seu cadastro e vamos dar continuidade com a contratacao do novo ponto.</p>
+      <p>Seja bem-vindo(a) a EBF Telecom. Recebemos seu cadastro e vamos dar continuidade com a contratacao do novo ponto.</p>
       <div style="background:#f4f8ff;border:1px solid #d7e6ff;border-radius:8px;margin:18px 0;padding:14px">
         <p style="margin:0 0 8px"><strong>ID do contrato:</strong> ${escapeHtml(safeContract)}</p>
         <p style="margin:0 0 8px"><strong>Plano escolhido:</strong> ${escapeHtml(safePlan)}</p>
@@ -1590,14 +1609,14 @@ async function sendConfirmationEmail({ to, name, contractId, planLabel, vencimen
       </div>
       ${signatureUrl ? `<p>Confira seu contrato e finalize a assinatura eletronica pelo link abaixo:</p>
       <p style="margin:22px 0;text-align:center"><a href="${escapeHtml(signatureUrl)}" style="background:#006cff;border-radius:8px;color:#ffffff;display:inline-block;font-weight:700;padding:13px 18px;text-decoration:none">Assinar contrato</a></p>
-      <p style="font-size:13px;color:#607086;word-break:break-all">Se o botao nao abrir, copie este link: ${escapeHtml(signatureUrl)}</p>` : "<p>O link correto da assinatura eletronica do contrato sera enviado pela equipe Fox Fibra assim que estiver disponivel.</p>"}
+      <p style="font-size:13px;color:#607086;word-break:break-all">Se o botao nao abrir, copie este link: ${escapeHtml(signatureUrl)}</p>` : "<p>O link correto da assinatura eletronica do contrato sera enviado pela equipe EBF Telecom assim que estiver disponivel.</p>"}
       <div style="background:#fff8df;border:1px solid #ffd166;border-radius:10px;margin:18px 0;padding:14px;text-align:center">
-        <p style="font-size:16px;font-weight:800;margin:0 0 6px;color:#102033">Avalie a Fox Fibra no Google</p>
+        <p style="font-size:16px;font-weight:800;margin:0 0 6px;color:#102033">Avalie a EBF Telecom no Google</p>
         <p style="font-size:13px;margin:0 0 12px;color:#30445f">Sua avaliacao ajuda outros clientes.</p>
         <a href="${escapeHtml(GOOGLE_REVIEW_URL)}" style="background:#f5b400;border-radius:8px;color:#06172f;display:inline-block;font-size:14px;font-weight:800;max-width:220px;padding:10px 14px;text-decoration:none;width:auto">Avaliar no Google</a>
       </div>
       <p>Se ainda nao enviou o print da tela de conclusao para o atendimento, envie pelo WhatsApp para facilitar a localizacao do cadastro.</p>
-      <p>Atenciosamente,<br><strong>Fox Fibra</strong></p>
+      <p>Atenciosamente,<br><strong>EBF Telecom</strong></p>
       </div>
     </div>
   `;
@@ -1629,12 +1648,12 @@ async function sendBrevoEmail({ to, name, subject, text, html }) {
     },
     body: JSON.stringify({
       sender: {
-        name: emailConfig.brevoSenderName || "Fox Fibra",
+        name: emailConfig.brevoSenderName || "EBF Telecom",
         email: emailConfig.brevoSenderEmail
       },
       to: [{ email: to, name }],
       replyTo: emailConfig.replyTo
-        ? { email: emailConfig.replyTo, name: emailConfig.brevoSenderName || "Fox Fibra" }
+        ? { email: emailConfig.replyTo, name: emailConfig.brevoSenderName || "EBF Telecom" }
         : undefined,
       subject,
       textContent: text,
@@ -1697,7 +1716,7 @@ async function handleContractTerm(req, res, url) {
   try {
     const termHtml = await contractTermHtml(contractId);
     if (!termHtml.trim()) {
-      send(res, 404, "Contrato ainda nao disponivel. Fale com a Fox Fibra pelo WhatsApp.", { "Content-Type": "text/plain; charset=utf-8" });
+      send(res, 404, "Contrato ainda nao disponivel. Fale com a EBF Telecom pelo WhatsApp.", { "Content-Type": "text/plain; charset=utf-8" });
       return true;
     }
     send(res, 200, termHtml, {
@@ -1711,7 +1730,7 @@ async function handleContractTerm(req, res, url) {
       contrato: contractId,
       error: errorSummary(error)
     });
-    send(res, 502, "Nao foi possivel abrir o contrato agora. Tente novamente ou fale com a Fox Fibra.", { "Content-Type": "text/plain; charset=utf-8" });
+    send(res, 502, "Nao foi possivel abrir o contrato agora. Tente novamente ou fale com a EBF Telecom.", { "Content-Type": "text/plain; charset=utf-8" });
     return true;
   }
 }
@@ -1748,7 +1767,7 @@ function enforceOfficialHost(req, res, url) {
 }
 
 async function handleCadastro(req, res) {
-  if (!SGP_APP || !SGP_TOKEN) return json(res, 503, { error: "Cadastro aguardando configuracao da Fox Fibra." });
+  if (!SGP_APP || !SGP_TOKEN) return json(res, 503, { error: "Cadastro aguardando configuracao da EBF Telecom." });
   if (!ensureOrigin(req)) return json(res, 403, { error: "Origem nao autorizada." });
   const session = getSession(req);
   if (!session) return json(res, 403, { error: "Sessao expirada. Atualize a pagina." });
@@ -1799,6 +1818,7 @@ async function handleCadastro(req, res) {
   };
   const selectedPlanId = planIdFor(data.plan);
   const selectedPlanLabel = planLabelFor(data.plan);
+  const selectedTvPlan = tvPlanFor(data.tv_plan);
   const mapLl = await geocodeAddress(address);
   const serviceDescription = installationServiceDescription({
     name: clean(data.nome, 120).toLocaleUpperCase("pt-BR"),
@@ -1812,8 +1832,9 @@ async function handleCadastro(req, res) {
     address
   });
   const observation = [
-    "Pre-cadastro realizado pelo formulario publico da Fox Fibra.",
+    "Pre-cadastro realizado pelo formulario publico da EBF Telecom.",
     `Plano escolhido: ${selectedPlanLabel}${selectedPlanId ? ` (ID SGP: ${selectedPlanId})` : ""}.`,
+    selectedTvPlan ? `Adicional de TV escolhido: ${selectedTvPlan.name} - ${selectedTvPlan.price} (ID SGP: ${selectedTvPlan.id}).` : "Sem adicional de TV.",
     `PPPoE: login ${cpf}, senha foxfibra, aquisicao comodato. CPF informado: ${formattedCpf}.`,
     `Vencimento escolhido: dia ${selectedVencimentoDay}.`,
     `Disponibilidade para instalacao: ${selectedAvailabilityLabel}.`,
@@ -1861,6 +1882,7 @@ async function handleCadastro(req, res) {
     clientPayload.plano_id = selectedPlanId;
     clientPayload.planointernet_id = selectedPlanId;
   }
+  if (selectedTvPlan?.id) clientPayload.planobase_id = selectedTvPlan.id;
   if (contractConfig.popId) clientPayload.pop_id = contractConfig.popId;
   if (contractConfig.nasId) clientPayload.nas_id = contractConfig.nasId;
   if (contractConfig.portadorId) clientPayload.portador_id = contractConfig.portadorId;
@@ -1922,7 +1944,7 @@ async function handleCadastro(req, res) {
       protocol: String(contractId || clientId || ""),
       documentMessage: contractId
         ? "Verifique seu e-mail para receber o contrato digital. Ele precisa ser assinado antes da chegada do tecnico."
-        : "Verifique seu e-mail e aguarde o contato da Fox Fibra para continuar o atendimento."
+        : "Verifique seu e-mail e aguarde o contato da EBF Telecom para continuar o atendimento."
     };
     json(res, 200, responsePayload);
   } catch (error) {
@@ -1934,7 +1956,7 @@ async function handleCadastro(req, res) {
     }
     if (isDuplicateCpfError(error)) {
       return json(res, 409, {
-        error: "Este CPF ja possui cadastro na Fox Fibra. Fale com um atendente para localizar ou atualizar o cadastro."
+        error: "Este CPF ja possui cadastro na EBF Telecom. Fale com um atendente para localizar ou atualizar o cadastro."
       });
     }
     const fieldError = sgpFieldError(error);
@@ -1944,7 +1966,7 @@ async function handleCadastro(req, res) {
     const code = supportCode();
     console.error(`[SG cadastro ${code}]`, errorSummary(error));
     json(res, 502, {
-      error: "Nao foi possivel concluir agora. Envie o codigo para a Fox Fibra verificar.",
+      error: "Nao foi possivel concluir agora. Envie o codigo para a EBF Telecom verificar.",
       support: code
     });
   }
@@ -2007,7 +2029,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Cadastro Fox Fibra rodando na porta ${PORT}`);
+  console.log(`Cadastro EBF Telecom rodando na porta ${PORT}`);
   startKeepAlive();
 });
 
