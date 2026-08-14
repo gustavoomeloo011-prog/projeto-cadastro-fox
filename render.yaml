@@ -13,6 +13,10 @@ services:
         sync: false
       - key: SGP_TOKEN
         sync: false
+      - key: SGP_WEB_USER
+        sync: false
+      - key: SGP_WEB_PASSWORD
+        sync: false
       - key: SESSION_SECRET
         generateValue: true
       - key: DAILY_LIMIT

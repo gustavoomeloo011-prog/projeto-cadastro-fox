@@ -1360,6 +1360,8 @@ async function updateInstallationOs(contractId, serviceDescription, cpf) {
 async function latestContractIdFor(cpf) {
   try {
     const data = await sgpPost("/api/central/contratos", {
+      app: SGP_APP,
+      token: SGP_TOKEN,
       cpfcnpj: cpf,
       senha: "foxfibra"
     });
@@ -1372,6 +1374,15 @@ async function latestContractIdFor(cpf) {
     console.error("[SG contrato consulta]", errorSummary(error));
     return "";
   }
+}
+
+async function waitForContractId(cpf, attempts = 6, intervalMs = 3000) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const contractId = await latestContractIdFor(cpf);
+    if (contractId) return contractId;
+    if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+  return "";
 }
 
 function confirmationEmailReady() {
@@ -1905,7 +1916,7 @@ async function handleCadastro(req, res) {
     const clientId = Number(client.id || client.precadastro_id || client.cliente_id || client?.precadastro?.id || client?.cliente?.id || 0);
     const directClienteId = Number(client.cliente_id || client?.cliente?.id || 0);
     registerSuccessfulCadastro(dailyLimitKeys);
-    const contractId = await latestContractIdFor(cpf);
+    const contractId = await waitForContractId(cpf);
     addEvent("cadastro", "criado", {
       cpf: maskCpf(cpf),
       contrato: contractId || "",
@@ -1918,6 +1929,12 @@ async function handleCadastro(req, res) {
         const osId = await updateInstallationOs(contractId, serviceDescription, cpf);
         if (!osId) throw new Error("OS nao localizada para o contrato.");
       });
+      enqueueJob("assinatura", `Contrato ${contractId} - gerar assinatura eletronica`, async () => {
+        const termReady = await waitForContractTerm(contractId);
+        if (!termReady) throw new Error("Termo do contrato ainda nao disponivel no SGP.");
+        const signatureUrl = await resolveSignatureContractUrl(contractId);
+        if (!signatureUrl) throw new Error("Link de assinatura eletronica nao gerado.");
+      }, 5, 5000);
     }
     enqueueJob("documentos", `Contrato ${contractId || "-"} - anexar documentos de ${maskCpf(cpf)}`, async () => {
       const clienteId = await clienteIdFor(cpf, contractId) || directClienteId;
