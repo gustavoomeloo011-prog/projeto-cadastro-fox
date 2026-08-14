@@ -105,9 +105,12 @@ const knownPlanIds = {
 };
 
 const vencimentoIdByDay = {
-  5: 1,
+  1: 1,
+  5: 7,
   10: 2,
-  20: 4,
+  15: 4,
+  20: 3,
+  25: 5,
   30: 6
 };
 
@@ -710,8 +713,7 @@ function htmlPage(csrf, nonce = "") {
     <form id="cadastro-form" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="${escapeHtml(csrf)}">
       <input class="hidden" name="website" tabindex="-1" autocomplete="off">
-      ${planOptions ? `<section class="form-section plans"><div class="section-title"><span class="section-number">1</span><div><h2>Escolha seu plano</h2><p>Selecione a velocidade ideal para sua casa.</p></div></div><div class="plan-list">${planOptions}</div><div class="tv-block"><div class="tv-heading"><strong>Quer adicionar TV?</strong><span class="optional">Opcional</span></div><div class="tv-list">${tvOptions}</div></div></section>` : ""}
-      <section class="form-section"><div class="section-title"><span class="section-number">2</span><div><h2>Seus dados</h2><p>Precisamos destas informações para criar o cadastro.</p></div></div><div class="grid">
+      <section class="form-section"><div class="section-title"><span class="section-number">1</span><div><h2>Seus dados</h2><p>Precisamos destas informações para criar o cadastro.</p></div></div><div class="grid">
         <label>Nome completo<input name="nome" autocomplete="name" autocapitalize="characters" class="uppercase-input" required></label>
         <label>CPF<input name="cpfcnpj" inputmode="numeric" autocomplete="off" required></label>
         <label>RG<input name="rg" autocomplete="off" required></label>
@@ -720,8 +722,8 @@ function htmlPage(csrf, nonce = "") {
         <label>Estado civil<select name="estadocivil" required><option value="">Selecione</option><option value="S">Solteiro(a)</option><option value="C">Casado(a)</option><option value="D">Divorciado(a)</option><option value="V">Viuvo(a)</option></select></label>
         <label>Celular/WhatsApp<input name="celular" type="tel" autocomplete="tel" required></label>
         <label class="full">E-mail<input name="email" type="email" autocomplete="email" required></label></div></section>
-      <section class="form-section"><div class="section-title"><span class="section-number">3</span><div><h2>Instalação e endereço</h2><p>Conte onde e quando prefere receber a equipe.</p></div></div><div class="grid">
-        <label>Vencimento<select name="vencimento" required><option value="">Selecione</option><option value="5">Dia 5</option><option value="10">Dia 10</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select></label>
+      <section class="form-section"><div class="section-title"><span class="section-number">2</span><div><h2>Instalação e endereço</h2><p>Conte onde e quando prefere receber a equipe.</p></div></div><div class="grid">
+        <label>Vencimento<select name="vencimento" required><option value="">Selecione</option><option value="1">Dia 1</option><option value="5">Dia 5</option><option value="10">Dia 10</option><option value="15">Dia 15</option><option value="20">Dia 20</option><option value="25">Dia 25</option><option value="30">Dia 30</option></select></label>
         <label>Disponibilidade para instalação<select name="disponibilidade" required><option value="">Selecione</option><option value="manha">Manhã das 09h - 12h</option><option value="tarde">Tarde das 12h - 17h</option><option value="total">Total</option></select></label>
         <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" required></label>
         <label>Numero<input name="numero" required></label>
@@ -731,11 +733,12 @@ function htmlPage(csrf, nonce = "") {
         <label>UF<input name="uf" maxlength="2" required></label>
         <label>Complemento<input name="complemento"></label>
         <label class="full">Ponto de referência<textarea name="pontoreferencia"></textarea></label></div></section>
-      <section class="form-section"><div class="section-title"><span class="section-number">4</span><div><h2>Confirmação de identidade</h2><p>As imagens são enviadas com segurança para o seu cadastro.</p></div></div><div class="documents">
+      <section class="form-section"><div class="section-title"><span class="section-number">3</span><div><h2>Confirmação de identidade</h2><p>As imagens são enviadas com segurança para o seu cadastro.</p></div></div><div class="documents">
         <div class="doc-copy"><strong>Documento com foto</strong><p>Envie frente e verso. No celular, você também pode tirar a foto na hora.</p></div>
         <label>Frente do documento<input name="documento_frente" type="file" accept="image/jpeg,image/png,image/webp" required></label>
         <label>Verso do documento<input name="documento_verso" type="file" accept="image/jpeg,image/png,image/webp" required></label>
       </div></section>
+      ${planOptions ? `<section class="form-section plans"><div class="section-title"><span class="section-number">4</span><div><h2>Escolha seu plano</h2><p>Finalize selecionando a internet e, se quiser, um adicional de TV.</p></div></div><div class="plan-list">${planOptions}</div><div class="tv-block"><div class="tv-heading"><strong>Quer adicionar TV?</strong><span class="optional">Opcional</span></div><div class="tv-list">${tvOptions}</div></div></section>` : ""}
       <label class="consent"><input type="checkbox" name="consent" value="1" required> Autorizo a EBF Telecom a usar estes dados para cadastro, atendimento e consulta de disponibilidade.</label>
       <div class="submit-row"><button type="submit">Quero contratar minha internet</button><small>Seus dados são usados somente para esta contratação.</small></div>
       <div id="result" class="result"></div>
