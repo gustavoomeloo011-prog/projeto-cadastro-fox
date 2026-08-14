@@ -32,5 +32,4 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: PLANS_JSON
-        sync: false
-
+        value: '{"100":{"id":11,"name":"100 Mega — R$ 49,99"},"150":{"id":8,"name":"150 Mega — R$ 49,99"},"250":{"id":14,"name":"250 Mega — R$ 69,99"},"300":{"id":10,"name":"300 Mega — R$ 89,99"},"350":{"id":19,"name":"350 Mega — R$ 79,99"},"400":{"id":22,"name":"400 Mega — R$ 69,99"},"500":{"id":9,"name":"500 Mega — R$ 89,99"},"600":{"id":30,"name":"600 Mega + App — R$ 89,99"},"700":{"id":29,"name":"700 Mega — R$ 89,99"},"800":{"id":18,"name":"800 Mega — R$ 129,99"},"900":{"id":28,"name":"900 Mega — R$ 99,99"},"1000":{"id":17,"name":"1 Giga — R$ 179,99"}}'

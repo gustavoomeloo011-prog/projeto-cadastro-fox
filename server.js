@@ -64,7 +64,7 @@ const contractConfig = {
   vencimentoDia: Number(process.env.CONTRACT_VENCIMENTO_DIA || 10),
   modoAquisicao: Number(process.env.CONTRACT_MODOAQUISICAO || 1),
   osInstalacao: String(process.env.CONTRACT_OS_INSTALACAO || "true") === "true",
-  plans: parsePlans(process.env.PLANS_JSON || '{"300":{"id":10,"name":"300 Mega"},"500":{"id":9,"name":"500 Mega"},"700":{"id":29,"name":"700 Mega"}}')
+  plans: parsePlans(process.env.PLANS_JSON || '{"100":{"id":11,"name":"100 Mega — R$ 49,99"},"150":{"id":8,"name":"150 Mega — R$ 49,99"},"250":{"id":14,"name":"250 Mega — R$ 69,99"},"300":{"id":10,"name":"300 Mega — R$ 89,99"},"350":{"id":19,"name":"350 Mega — R$ 79,99"},"400":{"id":22,"name":"400 Mega — R$ 69,99"},"500":{"id":9,"name":"500 Mega — R$ 89,99"},"600":{"id":30,"name":"600 Mega + App — R$ 89,99"},"700":{"id":29,"name":"700 Mega — R$ 89,99"},"800":{"id":18,"name":"800 Mega — R$ 129,99"},"900":{"id":28,"name":"900 Mega — R$ 99,99"},"1000":{"id":17,"name":"1 Giga — R$ 179,99"}}')
 };
 
 const emailConfig = {
@@ -84,9 +84,18 @@ const emailConfig = {
 const installationDescriptionTemplate = clean(process.env.INSTALLATION_SERVICE_DESCRIPTION || "", 1500);
 
 const knownPlanIds = {
+  "100": 11,
+  "150": 8,
+  "250": 14,
   "300": 10,
+  "350": 19,
+  "400": 22,
   "500": 9,
-  "700": 29
+  "600": 30,
+  "700": 29,
+  "800": 18,
+  "900": 28,
+  "1000": 17
 };
 
 const vencimentoIdByDay = {
