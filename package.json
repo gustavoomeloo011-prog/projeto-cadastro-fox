@@ -1,0 +1,15 @@
+{
+  "name": "projeto-cadastro-fox",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Formulario seguro de cadastro Fox Fibra com integracao SGP.",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "nodemailer": "^9.0.5"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

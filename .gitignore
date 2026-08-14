@@ -1,0 +1,4 @@
+.env
+.rate-limit.json
+node_modules/
+

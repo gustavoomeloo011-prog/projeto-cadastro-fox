@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: projeto-cadastro-fox
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: SGP_URL
+        value: https://foxfibrasp.sgp.net.br
+      - key: SGP_APP
+        sync: false
+      - key: SGP_TOKEN
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DAILY_LIMIT
+        value: 2
+      - key: MAX_UPLOAD_BYTES
+        value: 5242880
+      - key: MAX_REQUEST_BYTES
+        value: 14680064
+      - key: PRECADASTRO_ATIVAR
+        value: true
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: ALLOW_RENDER_HOST
+        value: true
+      - key: ADMIN_USER
+        value: Gustavo
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PLANS_JSON
+        sync: false
+
