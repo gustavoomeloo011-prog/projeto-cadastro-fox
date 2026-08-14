@@ -1379,11 +1379,40 @@ async function latestContractIdFor(cpf) {
         contract?.contrato || contract?.contrato_id || contract?.clientecontrato_id || 0
       ))
       .filter((id) => id > 0);
-    return ids.length ? String(Math.max(...ids)) : "";
+    if (ids.length) return String(Math.max(...ids));
   } catch (error) {
     console.error("[SG contrato consulta]", errorSummary(error));
-    return "";
   }
+  if (!SGP_WEB_USER || !SGP_WEB_PASSWORD) return "";
+  try {
+    const jar = await sgpWebLogin();
+    const query = new URLSearchParams({ tconsulta: "cpfcnpj", term: normalizeCpfText(cpf) });
+    const autocompleteResponse = await sgpWebRequest(`/public/autocomplete/ClienteAutocomplete?${query}`, {}, jar);
+    const autocompleteText = await autocompleteResponse.text();
+    const suggestions = parseJsonSafe(autocompleteText);
+    const items = Array.isArray(suggestions) ? suggestions : [];
+    const targetCpf = normalizeCpfText(cpf);
+    const match = items.find((item) => normalizeCpfText(item.cpfcnpj || item.cpf || item.label || "") === targetCpf)
+      || items[0];
+    const clientId = Number(match?.id || firstMatch(match?.url || "", /\/admin\/cliente\/(\d+)\//));
+    if (!clientId) return "";
+    const contractsResponse = await sgpWebRequest(`/admin/cliente/${clientId}/contratos/`, {}, jar);
+    const contractsHtml = await contractsResponse.text();
+    const idsFromStatusLinks = [...contractsHtml.matchAll(/\/admin\/contrato\/(\d+)\/status\//g)]
+      .map((entry) => Number(entry[1]))
+      .filter((id) => id > 0);
+    const idsFromGatewayLinks = [...contractsHtml.matchAll(/\/admin\/contrato\/(\d+)\/gateway\//g)]
+      .map((entry) => Number(entry[1]))
+      .filter((id) => id > 0);
+    const webIds = [...idsFromStatusLinks, ...idsFromGatewayLinks];
+    if (webIds.length) {
+      addEvent("contrato", "localizado-via-web", { contrato: String(Math.max(...webIds)), cliente: clientId });
+      return String(Math.max(...webIds));
+    }
+  } catch (error) {
+    console.error("[SG contrato consulta web]", errorSummary(error));
+  }
+  return "";
 }
 
 async function waitForContractId(cpf, attempts = 6, intervalMs = 3000) {
@@ -1547,21 +1576,18 @@ function installationServiceDescription({ name, cpf, phone, email, rg, planLabel
     referencia: clean(address.pontoreferencia, 180)
   };
   if (installationDescriptionTemplate) return fillTemplate(installationDescriptionTemplate, values);
+  const planName = values.plano.split("—")[0].trim().toUpperCase();
+  const normalizedAvailability = values.disponibilidade.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+  const availability = normalizedAvailability.includes("MANHA")
+    ? "MANHÃ"
+    : (normalizedAvailability.includes("TARDE") ? "TARDE" : values.disponibilidade.toUpperCase());
   return [
-    "📌 Novo cadastro recebido pelo site EBF Telecom",
+    `🌐 Plano de Internet: ${planName}`,
     "",
-    `📶 Plano escolhido: ${values.plano}`,
-    `⏰ Disponibilidade para instalacao: ${values.disponibilidade}`,
-    "",
-    `👤 Cliente: ${values.nome}`,
-    `🪪 CPF: ${values.cpf}`,
-    `📱 WhatsApp: ${values.telefone}`,
-    "",
-    `🏠 Endereco completo: ${values.endereco}`,
-    `📮 CEP: ${values.cep}`,
-    `📍 Ponto de referencia: ${values.referencia || "Nao informado"}`,
-    "",
-    "✅ Conferir disponibilidade, documentos e seguir com a ativacao/instalacao."
+    "💰 Taxa de Instalação: NÃO",
+    `📞 TEL: ${values.telefone}`,
+    `📍 Disponibilidade do Cliente: ${availability}`,
+    `🏠 Endereço Completo: ${address.logradouro}, ${address.numero}${address.complemento ? `, ${address.complemento}` : ""} - ${address.bairro}, ${address.cidade} - ${address.uf}, ${address.cep}, Brasil`
   ].join("\n");
 }
 
