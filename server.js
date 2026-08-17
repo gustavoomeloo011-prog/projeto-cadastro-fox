@@ -1177,7 +1177,6 @@ async function sgpGenerateSignatureContractUrl(contractId) {
   const body = new URLSearchParams({
     csrfmiddlewaretoken: csrf,
     dpb_token: dpbToken,
-    solicitar_geolocalizacao: "on",
     data_expiracao: ""
   });
   await sgpWebRequest(addPath, {
@@ -1351,8 +1350,7 @@ async function updateInstallationOs(contractId, serviceDescription, cpf) {
   await sgpForm(`/api/os/update/id/${osId}/`, {
     app: SGP_APP,
     token: SGP_TOKEN,
-    os_observacao: serviceDescription,
-    os_servicoprestado: serviceDescription
+    os_conteudo: serviceDescription
   });
   await updateOccurrenceContent(osId, cpf, serviceDescription);
   return osId;
@@ -1395,7 +1393,10 @@ async function latestContractIdFor(cpf) {
     const match = items.find((item) => normalizeCpfText(item.cpfcnpj || item.cpf || item.label || "") === targetCpf)
       || items[0];
     const clientId = Number(match?.id || firstMatch(match?.url || "", /\/admin\/cliente\/(\d+)\//));
-    if (!clientId) return "";
+    if (!clientId) {
+      addEvent("contrato", "busca-web-sem-cliente", { sugestoes: items.length });
+      return "";
+    }
     const contractsResponse = await sgpWebRequest(`/admin/cliente/${clientId}/contratos/`, {}, jar);
     const contractsHtml = await contractsResponse.text();
     const idsFromStatusLinks = [...contractsHtml.matchAll(/\/admin\/contrato\/(\d+)\/status\//g)]
@@ -1409,6 +1410,7 @@ async function latestContractIdFor(cpf) {
       addEvent("contrato", "localizado-via-web", { contrato: String(Math.max(...webIds)), cliente: clientId });
       return String(Math.max(...webIds));
     }
+    addEvent("contrato", "busca-web-sem-contrato", { cliente: clientId });
   } catch (error) {
     console.error("[SG contrato consulta web]", errorSummary(error));
   }
@@ -1972,6 +1974,18 @@ async function handleCadastro(req, res) {
         const signatureUrl = await resolveSignatureContractUrl(contractId);
         if (!signatureUrl) throw new Error("Link de assinatura eletronica nao gerado.");
       }, 5, 5000);
+    } else {
+      enqueueJob("finalizacao", `Localizar contrato e concluir OS/assinatura de ${maskCpf(cpf)}`, async () => {
+        const delayedContractId = await waitForContractId(cpf, 18, 10000);
+        if (!delayedContractId) throw new Error("Contrato ainda nao localizado apos a criacao.");
+        const osId = await updateInstallationOs(delayedContractId, serviceDescription, cpf);
+        if (!osId) throw new Error("OS nao localizada para o contrato.");
+        const termReady = await waitForContractTerm(delayedContractId);
+        if (!termReady) throw new Error("Termo do contrato ainda nao disponivel no SGP.");
+        const signatureUrl = await resolveSignatureContractUrl(delayedContractId);
+        if (!signatureUrl) throw new Error("Link de assinatura eletronica nao gerado.");
+        addEvent("cadastro", "finalizado", { contrato: delayedContractId, os: osId, assinatura: "ok" });
+      }, 4, 10000);
     }
     enqueueJob("documentos", `Contrato ${contractId || "-"} - anexar documentos de ${maskCpf(cpf)}`, async () => {
       const clienteId = await clienteIdFor(cpf, contractId) || directClienteId;
