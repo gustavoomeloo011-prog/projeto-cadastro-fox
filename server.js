@@ -1358,6 +1358,23 @@ async function updateInstallationOs(contractId, serviceDescription, cpf) {
 
 async function latestContractIdFor(cpf) {
   try {
+    const data = await sgpPost("/api/central/contratos", {
+      cpfcnpj: cpf,
+      senha: "foxfibra"
+    });
+    const contracts = Array.isArray(data?.contratos) ? data.contratos : [];
+    const ids = contracts
+      .map((contract) => Number(contract?.contrato || contract?.contrato_id || contract?.id || 0))
+      .filter((id) => id > 0);
+    if (ids.length) {
+      const contractId = String(Math.max(...ids));
+      addEvent("contrato", "localizado-via-central", { contrato: contractId });
+      return contractId;
+    }
+  } catch (error) {
+    console.error("[SG contrato consulta central]", errorSummary(error));
+  }
+  try {
     const data = await sgpForm("/api/ura/clientes/", {
       app: SGP_APP,
       token: SGP_TOKEN,
